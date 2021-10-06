@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const config = require("config");
+// const config = require("config");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -43,7 +45,7 @@ UserSchema.pre("save", async function (next) {
 UserSchema.methods.generateAuthToken = async function () {
     const { _id } = this;
     // process.env.JWT_KEY -> Bearer should be replaced by this
-    return jwt.sign({ user: { id: _id } }, config.get("JwtSecret"),);
+    return jwt.sign({ user: { id: _id } }, process.env.JWT_SECRET);
 };
 UserSchema.methods.createResetPasswordToken = async function () {
     this.resetPasswordToken = crypto.randomBytes(64).toString("hex");
