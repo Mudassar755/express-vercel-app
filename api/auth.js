@@ -8,7 +8,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const auth = require("../middleware/auth");
 const User = require("../models/User");
-const sgMail = require('@sendgrid/mail')
 const nodemailer = require("nodemailer");
 
 const router = express.Router();
