@@ -28,7 +28,7 @@ exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
       transport: transporter,
     });
     return await email.send({
-      template,
+      template: template,
       message: {
         to,
       },

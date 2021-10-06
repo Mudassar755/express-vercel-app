@@ -87,7 +87,7 @@ router.post("/resetPassword", async (req, res) => {
         {
           to: email,
           from: process.env.USER,
-          subject: "Reset Password",
+          // subject: "Reset Password",
         },
         {
           resetToken,
