@@ -29,10 +29,16 @@ var corsOptions = {
 }
 
 //Return Unauthorized Error Message
-app.get('*', function (req, res) {
+// app.get('*', function (req, res) {
+//     res.json({
+//         code: 510,
+//         msg: "access denied"
+//     });
+// })
+app.get('/', function (req, res) {
     res.json({
-        code: 510,
-        msg: "access denied"
+        code: 200,
+        msg: "access accepted"
     });
 })
 
