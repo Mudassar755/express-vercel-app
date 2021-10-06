@@ -8,22 +8,18 @@
     "server": "nodemon index.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "^7.4.7",
     "bcryptjs": "^2.4.3",
     "config": "^3.3.6",
     "cors": "^2.8.5",
-    "debug": "^4.3.2",
     "dotenv": "^10.0.0",
     "email-templates": "^8.0.8",
     "express": "^4.17.1",
     "express-useragent": "^1.0.15",
     "express-validator": "^6.12.2",
     "helmet": "^4.6.0",
-    "jade": "^1.11.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.9",
     "nodemailer": "^6.6.5",
-    "nodemailer-express-handlebars": "^4.0.0",
     "pug": "^3.0.2"
   },
   "devDependencies": {
