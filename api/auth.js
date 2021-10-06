@@ -8,6 +8,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 const auth = require("../middleware/auth");
 const User = require("../models/User");
+const sgMail = require('@sendgrid/mail')
+const nodemailer = require("nodemailer");
 
 const router = express.Router();
 
@@ -83,19 +85,69 @@ router.post("/resetPassword", async (req, res) => {
     }
     if (user) {
       const resetToken = await user.createResetPasswordToken();
-      await mailService.sendEmail(
-        {
-          to: email,
-          from: process.env.USER,
-          // subject: "Reset Password",
+
+      const transporter = nodemailer.createTransport({
+        port: 465,
+        host: "smtp.gmail.com",
+        auth: {
+            user: "mudasar.se@gmail.com",
+            pass: "sanghera786",
         },
-        {
-          resetToken,
-          id: user._id,
-          name: user.name
+        secure: true,
+    });
+    
+    await new Promise((resolve, reject) => {
+        // verify connection configuration
+        transporter.verify(function (error, success) {
+            if (error) {
+                console.log(error);
+                reject(error);
+            } else {
+                console.log("Server is ready to take our messages");
+                resolve(success);
+            }
+        });
+    });
+    
+    const mailData = {
+        from: {
+            name: `Mudassar ali`,
+            address: "mudasar.se@gmail.com",
         },
-        "resetPassword"
-      );
+        replyTo: email,
+        to: "mudasar.se@gmail.com",
+        subject: `form message`,
+        text: "message is testing",
+        html: `message is tsting html`,
+    };
+    
+    await new Promise((resolve, reject) => {
+        // send mail
+        transporter.sendMail(mailData, (err, info) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            } else {
+                console.log(info);
+                resolve(info);
+            }
+        });
+    });
+    
+    res.status(200).json({ status: "OK" });
+      // await mailService.sendEmail(
+      //   {
+      //     to: email,
+      //     from: process.env.USER,
+      //     // subject: "Reset Password",
+      //   },
+      //   {
+      //     resetToken,
+      //     id: user._id,
+      //     name: user.name
+      //   },
+      //   "resetPassword"
+      // );
       res.send({
         success: true,
       });

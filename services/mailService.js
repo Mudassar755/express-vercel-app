@@ -35,18 +35,7 @@ exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
       locals,
     });
   }
- return transporter.sendMail({
-      
-    from: from,
-          
-    to: to,
-          
-    subject: 'Reset Password',
-          
-    html: 'hello world!'
-      
-    });
-  // return transporter.sendMail(mailOptions);
+  return transporter.sendMail(mailOptions);
 }
 
   // exports.sendRealEmail = CatchAsync.CatchAsync(
