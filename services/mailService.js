@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const Email = require("email-templates");
+var directTransport = require('nodemailer-direct-transport');
 const dotenv = require("dotenv");
 dotenv.config();
 const transporter = nodemailer.createTransport({
@@ -35,7 +36,18 @@ exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
       locals,
     });
   }
-  return transporter.sendMail(mailOptions);
+ return transporter.sendMail({
+      
+    from: from,
+          
+    to: to,
+          
+    subject: 'Reset Password',
+          
+    html: 'hello world!'
+      
+    });
+  // return transporter.sendMail(mailOptions);
 }
 
   // exports.sendRealEmail = CatchAsync.CatchAsync(
