@@ -5,7 +5,8 @@ const config = require("config");
 // const mailService = require("../services/mailService");
 const { check, validationResult } = require("express-validator");
 // const crypto = require("crypto");
-
+const dotenv = require("dotenv");
+dotenv.config();
 // const auth = require("../middleware/auth");
 const User = require("../models/User");
 
@@ -75,10 +76,10 @@ router.post("/login",
           id: user.id
         }
       };
-
+console.log("sfsfsd", process.env.JWT_SECRET)
       jwt.sign(
         payload,
-        config.get("JwtSecret"),
+        process.env.JWT_SECRET,
         { expiresIn: '24h' },
         (err, token) => {
           if (err) throw err;
