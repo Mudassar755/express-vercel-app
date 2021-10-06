@@ -1,6 +1,6 @@
 const express = require('express')
 const auth = require("./api/auth")
-// const connectDB = require('./config/db');
+const connectDB = require('./config/db');
 // var cors = require("cors");
 // var helmet = require('helmet')
 // const dotenv = require("dotenv");
@@ -9,9 +9,10 @@ const auth = require("./api/auth")
 
 const app = express();
 // app.use(helmet())
-app.use(express.json({extended: false}))
+
 //Connect MongoDB
-// connectDB();
+connectDB();
+app.use(express.json({extended: false}))
 
 app.use("/api/auth", auth)
 const PORT = process.env.PORT || 5002;
