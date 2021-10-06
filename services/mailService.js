@@ -18,44 +18,23 @@ exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
   console.log("mail options", mailOptions)
   console.log("locals", locals)
   console.log("template", template)
-  // if (template) {
-  //   const email = new Email({
-  //     message: {
-  //       from
-  //     },
-  //     // uncomment below to send emails in development/test env:
-  //     send: true,
-  //     transport: transporter,
-  //   });
-  //   return await email.send({
-  //     template,
-  //     message: {
-  //       to,
-  //     },
-  //     locals,
-  //   });
-  // }
-  const email = new Email({
-    message: {
-      from: from
-    },
-    // uncomment below to send emails in development/test env:
-    // send: true
-    transport: {
-      jsonTransport: true
-    }
-  });
-  
-  email
-    .send({
-      template: 'resetPassword',
+  if (template) {
+    const email = new Email({
       message: {
-        to: to
+        from
       },
-      locals
-    })
-    .then(console.log)
-    .catch(console.error);
+      // uncomment below to send emails in development/test env:
+      send: true,
+      transport: transporter,
+    });
+    return await email.send({
+      template,
+      message: {
+        to,
+      },
+      locals,
+    });
+  }
   return transporter.sendMail(mailOptions);
 }
 
