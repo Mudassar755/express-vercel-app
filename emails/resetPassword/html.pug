@@ -1,0 +1,9 @@
+p
+  | We have received a request to reset your account’s password. Click the link given 
+| below to create a new password.
+p
+|
+a(href= process.env.DOMAIN_Front+`change-password?token=`+resetToken+`&id=`+id) #{process.env.DOMAIN_Front+`change-password?token=`+resetToken+`&id=`+id}
+p
+|
+| If you didn’t make the Forget Password request, please ignore this email.
