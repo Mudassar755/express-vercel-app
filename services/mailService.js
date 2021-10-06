@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
 const Email = require("email-templates");
-var directTransport = require('nodemailer-direct-transport');
 const dotenv = require("dotenv");
 dotenv.config();
 const transporter = nodemailer.createTransport({
