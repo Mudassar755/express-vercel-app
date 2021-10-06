@@ -1,0 +1,9 @@
+p
+  | Dear User,
+p
+  | Thank you for creating the account on logomaker.net. Please verify your account by  
+  | clicking the link given below.
+  p
+  |
+  a(href= process.env.DOMAIN_Front+`validate?token=`+validationToken+`&id=`+id) #{process.env.DOMAIN_Front+`validate?token=`+validationToken+`&id=`+id}
+  
