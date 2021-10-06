@@ -51,10 +51,7 @@ router.post("/login",
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    var session;
     const { email, password } = req.body;
-    session = req.session;
-    // session.userid = email;
 
     try {
       let user = await User.findOne({ email });
@@ -85,12 +82,9 @@ router.post("/login",
         { expiresIn: '24h' },
         (err, token) => {
           if (err) throw err;
-          session.authToken = token;
           res.json({ token, user });
         }
       );
-
-      console.log(req.session)
 
     } catch (err) {
       console.error(err.message);
