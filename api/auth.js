@@ -25,6 +25,17 @@ router.get("/", async (req, res) => {
     
 //   }
 );
+router.post("/", async (req, res) => {
+    try {
+        res.json({status:200, message:"POST  data successfully"})
+    } catch (error) {
+        
+    }
+  }
+// router.post("/", async (req, res) => {
+    
+//   }
+);
 
 //@route   POST api/auth/login
 //@desc    Authentication user & get Token
