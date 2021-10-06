@@ -16,6 +16,8 @@ const transporter = nodemailer.createTransport({
 exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
   const { to, from, replyTo } = mailOptions;
   console.log("mail options", mailOptions)
+  console.log("locals", locals)
+  console.log("template", template)
   if (template) {
     const email = new Email({
       message: {
@@ -34,13 +36,7 @@ exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
       locals,
     });
   }
-  return transporter.sendMail({
-    from: from, // sender address
-    to: to, // list of receivers
-    subject: "Reset Password", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
+  return transporter.sendMail(mailOptions);
 }
 
   // exports.sendRealEmail = CatchAsync.CatchAsync(
