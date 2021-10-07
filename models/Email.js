@@ -14,7 +14,7 @@ const EmailSchema = mongoose.Schema({
         type: String
     },
 
-    messgae: {
+    message: {
         type: String
     },
 

@@ -1,7 +1,9 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
 const mailService = require("../services/mailService");
+const Email = require("../models/Email")
 const config = require('config');
+const auth = require("../middleware/auth");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -25,41 +27,30 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { firstName, lastName, email, subject, message } = req.body;
+        const { name, email, subject, message } = req.body;
 
         try {
-            // console.log("req,", req.body)
-            const { emailTo: to, lead: html } = req.body;
-            if (email) {
-                await mailService.sendEmail(
-                    {
-                        to: config.get("USER"),
-                        from: config.get("USER"),
-                        subject: "Feedback",
-                        replyTo: email
-                    },
-                    {
-                        firstName: firstName,
-                        email: email,
-                        subject: subject,
-                        message: message,
-                    },
-                    "feedback"
-                );
-            }
-            else {
-                await mailService.sendEmail(
-                    {
-                        to: config.get("USER"),
-                        from: config.get("USER"),
-                        subject: "Faqs",
-                    },
-                    {
-                        message: message,
-                    },
-                    "faqs"
-                );
-            }
+            await mailService.sendEmail(
+                {
+                    to: process.env.USER,
+                    from: process.env.USER,
+                    replyTo: email,
+                },
+                {
+                    subject: subject,
+                    message: message,
+                    html: `<p>You are receiving this message from ${email} </p>
+                        <p> Hello! <br> ${message} </p>`
+                },
+                "feedback"
+            );
+            const mail = new Email({
+                name,
+                email,
+                subject,
+                message
+            });
+            await mail.save();
 
             res.send({ success: true });
 
@@ -68,7 +59,66 @@ router.post(
             res.status(500).send("Server Error");
         }
     }
-
 );
+
+//@route   POST api/mail
+//@desc    Update Email
+//@access  Public
+router.post(
+    "/update",
+    auth,
+    async (req, res) => {
+      const errors = validationResult(req);
+      //need to understand
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+  
+      const { name, email, subject, message } = req.body;
+  
+      const emailFields = {};
+      if (name) emailFields.name = name;
+      if (email) emailFields.email = email;
+      if (subject) emailFields.subject = subject;
+      if (message) emailFields.message = message;
+  
+      try {
+        let mail = await Email.findOne({ _id: req.body.id });
+  
+        if (mail) {
+  
+          // await mail.save();
+          mail = await Email.findOneAndUpdate(
+            { _id: req.body.id },
+            { $set: emailFields },
+            { new: true }
+          );
+  
+          return res.json(mail);
+        }
+  
+      } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+      }
+    }
+  );
+
+//@route   DELETE api/profile
+//@desc    Delete  user
+//@access  Private
+
+router.delete("/", auth, async (req, res) => {
+    try {
+  
+      //Remove user
+      await Email.findOneAndRemove({ _id: req.body.id });
+  
+      res.json({ msg: "Email deleted" });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  });
 
 module.exports = router;

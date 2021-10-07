@@ -24,43 +24,44 @@ const transporter = nodemailer.createTransport({
 // });
 
 exports.sendEmail = async (mailOptions, locals = {}, template = "") => {
-  const { to, from } = mailOptions;
+  const { to, from, replyTo } = mailOptions;
+  const {subject, message, html} = locals;
   await new Promise((resolve, reject) => {
     // verify connection configuration
     transporter.verify(function (error, success) {
-        if (error) {
-            console.log(error);
-            reject(error);
-        } else {
-            console.log("Server is ready to take our messages");
-            resolve(success);
-        }
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        // console.log("Server is ready to take our messages");
+        resolve(success);
+      }
     });
-});
-const mailData = {
-  from: {
+  });
+  const mailData = {
+    from: {
       name: `Mudassar ali`,
       address: from,
-  },
-  replyTo: to,
-  to: to,
-  subject: `form message`,
-  text: "message is testing",
-  html: `message is tsting html`,
-};
+    },
+    replyTo: replyTo,
+    to: to,
+    subject: subject,
+    text: message,
+    html: html,
+  };
 
-await new Promise((resolve, reject) => {
-  // send mail
-  return transporter.sendMail(mailData, (err, info) => {
+  await new Promise((resolve, reject) => {
+    // send mail
+    return transporter.sendMail(mailData, (err, info) => {
       if (err) {
-          console.error(err);
-          reject(err);
+        console.error(err);
+        reject(err);
       } else {
-          console.log(info);
-          resolve(info);
+        console.log(info);
+        resolve(info);
       }
+    });
   });
-});
   // console.log("mail options", mailOptions)
   // console.log("locals", locals)
   // console.log("template", template)

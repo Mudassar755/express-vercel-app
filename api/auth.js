@@ -68,6 +68,79 @@ router.post("/login",
   }
 );
 
+//@route   POST api/users
+//@desc    Register user
+//@access  Public
+router.post(
+  "/register",
+  [
+    check("name", "name is required")
+      .not()
+      .isEmpty(),
+    check("email", "please include a valid email").isEmail(),
+    check("password", "password must be 6 characters or more").isLength({
+      min: 6
+    })
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    //need to understand
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, email, password } = req.body;
+
+    try {
+      let user = await User.findOne({ email });
+
+      if (user) {
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "User already exist" }] });
+      }
+
+      const avatar = gravatar.url(email, {
+        s: "200", //size
+        r: "pg", //rating
+        d: "mm" //default
+      });
+
+      user = new User({
+        name,
+        email,
+        avatar,
+        password
+      });
+
+      const salt = await bcrypt.genSalt(10);
+
+      user.password = await bcrypt.hash(password, salt);
+
+      await user.save();
+
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(
+        payload,
+        config.get("JwtSecret"),
+        { expiresIn: '24h' },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token, user });
+        }
+      );
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+
 //@route   POST api/auth/resetPassword
 //@desc    Reset Password
 //@access  Public
@@ -85,65 +158,20 @@ router.post("/resetPassword", async (req, res) => {
     if (user) {
       const resetToken = await user.createResetPasswordToken();
 
-    //   const transporter = nodemailer.createTransport({
-    //     port: 465,
-    //     host: "smtp.gmail.com",
-    //     auth: {
-    //         user: "mudasar.se@gmail.com",
-    //         pass: "sanghera786",
-    //     },
-    //     secure: true,
-    // });
-    
-    // await new Promise((resolve, reject) => {
-    //     // verify connection configuration
-    //     transporter.verify(function (error, success) {
-    //         if (error) {
-    //             console.log(error);
-    //             reject(error);
-    //         } else {
-    //             console.log("Server is ready to take our messages");
-    //             resolve(success);
-    //         }
-    //     });
-    // });
-    
-    // const mailData = {
-    //     from: {
-    //         name: `Mudassar ali`,
-    //         address: "mudasar.se@gmail.com",
-    //     },
-    //     replyTo: email,
-    //     to: "mudasar.se@gmail.com",
-    //     subject: `form message`,
-    //     text: "message is testing",
-    //     html: `message is tsting html`,
-    // };
-    
-    // await new Promise((resolve, reject) => {
-    //     // send mail
-    //     transporter.sendMail(mailData, (err, info) => {
-    //         if (err) {
-    //             console.error(err);
-    //             reject(err);
-    //         } else {
-    //             console.log(info);
-    //             resolve(info);
-    //         }
-    //     });
-    // });
-    
-    // res.status(200).json({ status: "OK" });
       await mailService.sendEmail(
         {
           to: email,
-          from: process.env.USER,
-          // subject: "Reset Password",
+          from: process.env.USER
         },
         {
-          resetToken,
-          id: user._id,
-          name: user.name
+          subject: "Reset Password",
+          message: "Reset Your Password",
+          html: `<p>We have received a request to reset your account’s password. Click the link given
+          below to create a new password.</p>
+          <p>
+          <a href= ${process.env.DOMAIN_Front}change-password?token=${resetToken}&id=${user._id}> ${process.env.DOMAIN_Front}change-password?token=${resetToken}&id=${user._id} </a>
+          <br>
+          <p>If you didn’t make the Forget Password request, please ignore this email.<p>`,
         },
         "resetPassword"
       );
@@ -164,6 +192,7 @@ router.post("/resetPassword", async (req, res) => {
 
 router.post("/validResetPassword", async (req, res, next) => {
   const { token: resetPasswordToken, id } = req.body;
+
   try {
     const user = await User.findOneAndUpdate(
       {
@@ -179,11 +208,7 @@ router.post("/validResetPassword", async (req, res, next) => {
         .status(400)
         .json({ errors: [{ msg: "User Token is incorrect or expired!" }] });
     }
-    // console.log("userrr", user)
-    // const user = await User.findOne({
-    //   _id: id,
-    //   resetPasswordToken: token,
-    // });
+
     if (user) {
       const token = await user.generateAuthToken();
       res.send({
@@ -246,7 +271,6 @@ router.post("/updatePassword", auth, [
   }
   const { currentUser } = req;
   const { password } = req.body;
-
   // const userFields = {};
   //   if (password) userFields.password = password;
   try {
