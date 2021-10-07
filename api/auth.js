@@ -100,16 +100,9 @@ router.post(
           .json({ errors: [{ msg: "User already exist" }] });
       }
 
-      const avatar = gravatar.url(email, {
-        s: "200", //size
-        r: "pg", //rating
-        d: "mm" //default
-      });
-
       user = new User({
         name,
         email,
-        avatar,
         password
       });
 
@@ -127,7 +120,7 @@ router.post(
 
       jwt.sign(
         payload,
-        config.get("JwtSecret"),
+        process.env.JWT_SECRET,
         { expiresIn: '24h' },
         (err, token) => {
           if (err) throw err;
