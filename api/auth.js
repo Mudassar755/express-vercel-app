@@ -85,68 +85,68 @@ router.post("/resetPassword", async (req, res) => {
     if (user) {
       const resetToken = await user.createResetPasswordToken();
 
-      const transporter = nodemailer.createTransport({
-        port: 465,
-        host: "smtp.gmail.com",
-        auth: {
-            user: "mudasar.se@gmail.com",
-            pass: "sanghera786",
+    //   const transporter = nodemailer.createTransport({
+    //     port: 465,
+    //     host: "smtp.gmail.com",
+    //     auth: {
+    //         user: "mudasar.se@gmail.com",
+    //         pass: "sanghera786",
+    //     },
+    //     secure: true,
+    // });
+    
+    // await new Promise((resolve, reject) => {
+    //     // verify connection configuration
+    //     transporter.verify(function (error, success) {
+    //         if (error) {
+    //             console.log(error);
+    //             reject(error);
+    //         } else {
+    //             console.log("Server is ready to take our messages");
+    //             resolve(success);
+    //         }
+    //     });
+    // });
+    
+    // const mailData = {
+    //     from: {
+    //         name: `Mudassar ali`,
+    //         address: "mudasar.se@gmail.com",
+    //     },
+    //     replyTo: email,
+    //     to: "mudasar.se@gmail.com",
+    //     subject: `form message`,
+    //     text: "message is testing",
+    //     html: `message is tsting html`,
+    // };
+    
+    // await new Promise((resolve, reject) => {
+    //     // send mail
+    //     transporter.sendMail(mailData, (err, info) => {
+    //         if (err) {
+    //             console.error(err);
+    //             reject(err);
+    //         } else {
+    //             console.log(info);
+    //             resolve(info);
+    //         }
+    //     });
+    // });
+    
+    // res.status(200).json({ status: "OK" });
+      await mailService.sendEmail(
+        {
+          to: email,
+          from: process.env.USER,
+          // subject: "Reset Password",
         },
-        secure: true,
-    });
-    
-    await new Promise((resolve, reject) => {
-        // verify connection configuration
-        transporter.verify(function (error, success) {
-            if (error) {
-                console.log(error);
-                reject(error);
-            } else {
-                console.log("Server is ready to take our messages");
-                resolve(success);
-            }
-        });
-    });
-    
-    const mailData = {
-        from: {
-            name: `Mudassar ali`,
-            address: "mudasar.se@gmail.com",
+        {
+          resetToken,
+          id: user._id,
+          name: user.name
         },
-        replyTo: email,
-        to: "mudasar.se@gmail.com",
-        subject: `form message`,
-        text: "message is testing",
-        html: `message is tsting html`,
-    };
-    
-    await new Promise((resolve, reject) => {
-        // send mail
-        transporter.sendMail(mailData, (err, info) => {
-            if (err) {
-                console.error(err);
-                reject(err);
-            } else {
-                console.log(info);
-                resolve(info);
-            }
-        });
-    });
-    
-    res.status(200).json({ status: "OK" });
-      // await mailService.sendEmail(
-      //   {
-      //     to: email,
-      //     from: process.env.USER,
-      //     // subject: "Reset Password",
-      //   },
-      //   {
-      //     resetToken,
-      //     id: user._id,
-      //     name: user.name
-      //   },
-      //   "resetPassword"
-      // );
+        "resetPassword"
+      );
       res.send({
         success: true,
       });
